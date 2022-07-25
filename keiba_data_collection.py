@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[367]:
+# In[ ]:
 
 #各年のレース情報取得
 
@@ -13,18 +13,28 @@ import time
 import pandas
 import os
 
+
+#レース名を入力する(ディレクトリ名になる)
+race_name="kikkasyo2022"
+
 #ディレクトリ作成 (好きなディレクトリを指定)
-os.makedirs("./競馬/sprinters2022/raceInfo/")
+keiba_dir =  "./競馬/{}".format(race_name)
+os.makedirs(keiba_dir+"/raceInfo")
+os.makedirs(keiba_dir+"/horseInfo")
+os.makedirs(keiba_dir+"/allInfo")
+
 
 #過去20年のレースIDの取得
 raceid_list = []
-#URLを変更することで有馬記念以外のレースも取得できるはず
+#URLを変更することで有馬記念以外のレースも取得可能(OPレース等名前があるレースに限る)
 #url = "https://db.netkeiba.com/?pid=race_list&word=%5E%CD%AD%C7%CF%B5%AD%C7%B0"
-url = "https://db.netkeiba.com/?pid=race_list&word=%A5%B9%A5%D7%A5%EA%A5%F3%A5%BF%A1%BC%A5%BA%A5%B9%A5%C6%A1%BC%A5%AF%A5%B9&front=1"
+#url = "https://db.netkeiba.com/?pid=race_list&word=%A5%B9%A5%D7%A5%EA%A5%F3%A5%BF%A1%BC%A5%BA%A5%B9%A5%C6%A1%BC%A5%AF%A5%B9&front=1"
+url = "https://db.netkeiba.com/?pid=race_list&word=%5E%B5%C6%B2%D6%BE%DE"
 r = requests.get(url)
 soup = BeautifulSoup(r.content, "html.parser")
 
 soup_txt_race = soup.find_all(href = re.compile("/race/20"))
+
 for num in range(20):
     raceid_list.append(soup_txt_race[num].attrs['href'])
 
@@ -124,23 +134,21 @@ for count,i in enumerate(raceid_list):
     #CSV書き出し
     #ファイルパス指定
     year = 2021-count    
-    filepass1 = "./競馬/sprinters2022/raceInfo/{}_test.csv"
-    filepass2 = filepass1.format(year)
-    with open(filepass2, 'a', newline = '',encoding = "SHIFT-JIS") as f:
+    filepass1 = keiba_dir+"/raceInfo/{}_test.csv".format(year)
+    with open(filepass1, 'a', newline = '',encoding = "SHIFT-JIS") as f:
         csv.writer(f).writerows(houseInfo)
-    col_num = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-    df = pandas.read_csv(filepass2,encoding = "SHIFT-JIS",names = col_num)
+    col_num = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
+    df = pandas.read_csv(filepass1,encoding = "SHIFT-JIS",names = col_num)
     
     #列名追加
     df_mod = df.rename(index = {0:"馬名",1:"騎手名",2:"枠順",3:"走破タイム",4:"オッズ",5:"通過順位",6:"馬体重",7:"性齢",8:"斤量",9:"上がり3ハロン",10:"人気"})
   
     #ファイル書き出し
-    filepass3 = "./競馬/sprinters2022/raceInfo/{}.csv"
-    filepass4 = filepass3.format(year)
-    df_mod.to_csv(filepass4)
+    filepass2 = keiba_dir+"/raceInfo/{}.csv".format(year)
+    df_mod.to_csv(filepass2)
     
     #testファイルの削除
-    os.remove(filepass2)
+    os.remove(filepass1)
     
     #間隔
     time.sleep(1)
@@ -155,21 +163,12 @@ def inclusive_index(lst, purpose):
 
     raise IndexError
 
-#ディレクトリ作成
-os.makedirs("./競馬/sprinters2022/horseInfo/")
-
-#過去20年のレースIDの取得
-baseurl = "https://db.netkeiba.com/?pid=race_list&word=%5E%CD%AD%C7%CF%B5%AD%C7%B0"
-r1= requests.get(baseurl)
-soup1 = BeautifulSoup(r1.content, "html.parser")
-soup1_txt_race = soup1.find_all(href = re.compile("/race/20"))
-
 #レースidと検索用パラメータの格納
 race_para_list=[]
 raceid_list = []
 for num in range(20):
-    race_para_list.append(soup1_txt_race[num])
-    raceid_list.append(soup1_txt_race[num].attrs['href'])
+    race_para_list.append(soup_txt_race[num])
+    raceid_list.append(soup_txt_race[num].attrs['href'])
 
 #過去20年のレースのデータを取得
 for count,i in enumerate(raceid_list):
@@ -267,46 +266,40 @@ for count,i in enumerate(raceid_list):
             
         #CSVに書き出し
         year = 2021-count
-        filepass1 = "./競馬/sprinters2022/horseInfo/{}_test.csv"
-        filepass2 = filepass1.format(year)
-        with open(filepass2, 'a',newline = '',encoding = "SHIFT-JIS") as f:
+        filepass3 = keiba_dir+"/horseInfo/{}_test.csv".format(year)
+        with open(filepass3, 'a',newline = '',encoding = "SHIFT-JIS") as f:
             csv.writer(f).writerow(eachhorseInfo_mod)
     
 #csvの整理
     col_names=["芝適性","距離適性","脚質","成長","馬場適性","総合評価","実績評価","ポテンシャル評価","前走レース名","前走オッズ","前走成績","2走前レース名","2走前オッズ","2走前成績","3走前レース名","3走前オッズ","3走前成績"]
-    df = pandas.read_csv(filepass2,encoding = "SHIFT-JIS",names=col_names)
+    df = pandas.read_csv(filepass3,encoding = "SHIFT-JIS",names=col_names)
     year = 2021-count
-    filepass3 = "./競馬/sprinters2022/horseInfo/{}.csv"
-    filepass4 = filepass3.format(year)
+    filepass4 =  keiba_dir+"/horseInfo/{}.csv".format(year)
     #転置
     df.T.to_csv(filepass4)
     #testファイルの削除
-    os.remove(filepass2)
+    os.remove(filepass3)
     
 
 #レースデータと出走馬のデータの結合
 
-#ディレクトリ作成
-os.makedirs("./競馬/sprinters2022/allInfo/")
-
 for year in range(2002,2022):
-    racepass = "./競馬/sprinters2022/raceInfo/" + str(year) + ".csv"
-    horsepass = "./競馬/sprinters2022/horseInfo/" + str(year) + ".csv"
+    racepass =  keiba_dir+"/raceInfo/" + str(year) + ".csv"
+    horsepass =  keiba_dir+"/horseInfo/" + str(year) + ".csv"
     df1 = pandas.read_csv(racepass)
     df2 = pandas.read_csv(horsepass)
     df_concat = pandas.concat([df1,df2], axis = 0, ignore_index = False)
-    allInfopass_tmp = "./競馬/sprinters2022/allInfo/{}.csv"
-    allInfopass = allInfopass_tmp.format(year)
+    allInfopass =  keiba_dir+"/allInfo/{}.csv".format(year)
     df_concat.to_csv(allInfopass, index = False)
 
 # テスト
-pandas.read_csv("/Users/yamagamihiroki/競馬　ラップ分析/keiba/競馬/sprinters2022/allInfo/2020.csv",index_col=0,encoding = "utf-8")
+pandas.read_csv(keiba_dir+"/allInfo/2020.csv",index_col=0,encoding = "utf-8")
 
 
-# In[368]:
+# In[390]:
 
 # テスト
-pandas.read_csv("/Users/yamagamihiroki/競馬　ラップ分析/keiba/競馬/sprinters2022/allInfo/2020.csv",index_col=0,encoding = "utf-8")
+pandas.read_csv("/Users/yamagamihiroki/競馬　ラップ分析/keiba/競馬/sprinters2022/allInfo/2021.csv",index_col=0,encoding = "utf-8")
 
 
 # In[ ]:
