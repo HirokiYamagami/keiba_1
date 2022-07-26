@@ -28,7 +28,6 @@ os.makedirs(keiba_dir+"/allInfo")
 raceid_list = []
 #URLを変更することで有馬記念以外のレースも取得可能(OPレース等名前があるレースに限る)
 #url = "https://db.netkeiba.com/?pid=race_list&word=%5E%CD%AD%C7%CF%B5%AD%C7%B0"
-#url = "https://db.netkeiba.com/?pid=race_list&word=%A5%B9%A5%D7%A5%EA%A5%F3%A5%BF%A1%BC%A5%BA%A5%B9%A5%C6%A1%BC%A5%AF%A5%B9&front=1"
 url = "https://db.netkeiba.com/?pid=race_list&word=%5E%B5%C6%B2%D6%BE%DE"
 r = requests.get(url)
 soup = BeautifulSoup(r.content, "html.parser")
@@ -296,10 +295,27 @@ for year in range(2002,2022):
 pandas.read_csv(keiba_dir+"/allInfo/2020.csv",index_col=0,encoding = "utf-8")
 
 
-# In[390]:
+# In[401]:
+
+#各年のレース情報取得
+
+import requests
+from bs4 import BeautifulSoup
+import csv
+import re
+import time
+import pandas
+import os
+
+
+#レース名を入力する(ディレクトリ名になる)
+race_name="kikkasyo2022"
+
+#ディレクトリ作成 (好きなディレクトリを指定)
+keiba_dir =  "./競馬/{}".format(race_name)
 
 # テスト
-pandas.read_csv("/Users/yamagamihiroki/競馬　ラップ分析/keiba/競馬/sprinters2022/allInfo/2021.csv",index_col=0,encoding = "utf-8")
+pandas.read_csv(keiba_dir+"/allInfo/2021.csv",index_col=0,encoding = "utf-8")
 
 
 # In[ ]:
